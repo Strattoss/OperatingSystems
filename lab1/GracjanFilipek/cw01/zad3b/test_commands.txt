@@ -1,0 +1,19 @@
+init 5
+
+count dl_load.h
+count makefile
+count repl.c
+count wclib_dl.h
+count wclib.c
+count wclib.h
+
+delete index 0
+delete index 0
+delete index 0
+delete index 0
+delete index 0
+delete index 0
+
+destroy
+
+quit
