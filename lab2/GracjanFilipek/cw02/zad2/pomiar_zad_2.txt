@@ -1,0 +1,5 @@
+Pomiar
+Pomiar ./replace_1B.exe
+Czas = 21524
+Pomiar ./replace_1024B.exe
+Czas = 373

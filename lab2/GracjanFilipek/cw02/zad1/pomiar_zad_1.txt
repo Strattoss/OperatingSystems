@@ -1,0 +1,5 @@
+Pomiar
+Pomiar ./replace_lib.exe
+Czas = 1025
+Pomiar ./replace_sys.exe
+Czas = 440
