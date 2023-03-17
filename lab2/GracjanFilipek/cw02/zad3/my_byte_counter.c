@@ -38,5 +38,9 @@ int main()
 
     printf("Summarized size: %lld B\n", sum_sizes);
 
+    if (closedir(curr_dir) == -1) {
+        perror(NULL);
+    }
+
     return 0;
 }
