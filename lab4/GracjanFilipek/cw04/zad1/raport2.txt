@@ -1,0 +1,13 @@
+Wnioski
+Z raportu raport2.txt wynika, że:
+    - ignore:
+        - proces potomny: ustawienie ignorowania sygnału *dziedziczone*
+        - po exec: ustawienie ignorowania syganłu *pamiętane*
+    - handler:
+        - proces potomny: ustawienie wykonania funkcji dla sygnału *dziedziczone*
+    - mask:
+        - proces potomny: maska *dziedziczona*
+        - po exec: maska *pamiętana*
+    - pending:
+        - proces potomny: oczekujące sygnały *dziedziczone*
+        - po exec: oczekujące sygnały *nie pamiętane*

@@ -1,0 +1,33 @@
+IGNORE
+Parent raised signal 10
+Parent - is the signal pending: NO
+Parent after exec, is signal pending: NO
+Parent after exec, raised signal 10
+Parent after exec, is signal pending: NO
+Child raised signal 10
+Child - is the signal pending: NO
+
+HANDLER
+Parent raised signal 10
+Handler got signal: 10
+Parent - is the signal pending: NO
+Child raised signal 10
+Handler got signal: 10
+Child - is the signal pending: NO
+
+MASK
+Parent - is the signal pending: NO
+Parent after exec, is signal pending: NO
+Parent after exec, raised signal 10
+Parent after exec, is signal pending: YES
+Child raised signal 10
+Child - is the signal pending: YES
+
+PENDING
+Parent raised signal 10
+Parent - is the signal pending: YES
+Parent after exec, is signal pending: NO
+Parent after exec, raised signal 10
+Parent after exec, is signal pending: YES
+Child - is the signal pending: YES
+
