@@ -1,0 +1,26 @@
+TEST SA_SIGINFO
+Handler got signal: 10
+PID of sending process: 11186
+Passed information: 1
+Handler got signal: 10
+PID of sending process: 11186
+Passed information: 2
+Handler got signal: 10
+PID of sending process: 11186
+Passed information: 3
+
+TEST SA_RESETHAND
+Send signal before setting the handler (should be ignored)
+Set SIGCHILD handler with SA_RESETHAND flag
+Send signal
+Signal 17 handled
+Send signal (should be ignored)
+
+TEST SA_NODEFER
+Send signal SIGUSR2 (max stack depth: 5)
+Signal stack depth: 1
+Signal stack depth: 2
+Signal stack depth: 3
+Signal stack depth: 4
+Signal stack depth: 5
+
