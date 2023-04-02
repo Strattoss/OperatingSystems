@@ -114,8 +114,8 @@ int main(int argc, char **argv)
     int fork_pid = fork();
 
     if (fork_pid == -1) {
-
         perror("Failed to create a child process");
+        return 1;
     }
 
     if (fork_pid > 0) {

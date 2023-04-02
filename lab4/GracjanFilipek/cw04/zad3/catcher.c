@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
         sigsuspend(&only_sigusr1);
 
         // loop for mode 4
-        while (!flag_stay_in_loop) {
+        while (flag_stay_in_loop) {
             mode_2();
             sleep(1);
         }
