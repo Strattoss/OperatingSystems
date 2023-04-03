@@ -18,13 +18,37 @@ double calc_integral(double a, double b, double eps) {
     double sum = 0;
     double x = a;
 
-    while (x + eps <= b) {
+    while (x + eps < b) {
         sum += fun_to_integr(x + eps/2) * eps;
 
         x += eps;
     }
 
+    // add one last rectangle (it stretches from current x to b)
+    sum += fun_to_integr((x + b) / 2) * (b - x);
+
     return sum;
+}
+
+
+double read_pipes_and_sum_results(int num_of_processes, int* descriptors_to_read) {
+    double integral_sum = 0;
+    char buffer[BUFFER_SIZE];
+
+    for (int i = 0; i < num_of_processes; ++i) {
+        if (read(descriptors_to_read[i], buffer, BUFFER_SIZE) == -1) {
+            perror("Failed to read a pipe");
+            exit(1);
+        }
+        close(descriptors_to_read[i]);
+        integral_sum += atof(buffer);
+    }
+    return integral_sum;
+}
+
+
+long convert_to_nanoseconds(struct timespec* start, struct timespec* end) {
+    return end->tv_nsec + (end->tv_sec - start->tv_sec)*1000000000 - start->tv_nsec;
 }
 
 
@@ -47,13 +71,13 @@ int main(int argc, char **argv)
     char* tmp_ptr;
     double eps = strtod(argv[1], &tmp_ptr);
     if (*tmp_ptr != '\0') {
-        fprintf(stderr, "Requested precision not a number: %s\n", argv[1]);
+        fprintf(stderr, "Requested precision is not a number: %s\n", argv[1]);
         exit(1);
     }
 
     int num_of_proc = strtol(argv[2], &tmp_ptr, 10);
     if (*tmp_ptr != '\0') {
-        fprintf(stderr, "Requested number of processes nor a number: %s\n", argv[2]);
+        fprintf(stderr, "Requested number of processes is not an integer: %s\n", argv[2]);
         exit(1);
     }
 
@@ -64,10 +88,8 @@ int main(int argc, char **argv)
 
     // declaration of variables
     int child_to_parent[2];
-    int read_file_descriptors[num_of_proc];
-    int pid;
+    int descriptors_to_read[num_of_proc];
     double x_step = (BOUND_R - BOUND_L) / num_of_proc;
-    double integral_sum = 0;
     char buffer[BUFFER_SIZE];
 
     // start measuring time
@@ -79,45 +101,36 @@ int main(int argc, char **argv)
         // open pipe
         pipe(child_to_parent);
 
-        pid = fork();
-        if (pid == -1) {
-            perror("Failed to fork a process");
-            exit(1);
-        }
-        if (pid == 0) { //child
-            // close unnecessary file descriptor
-            close(child_to_parent[0]);
+        switch (fork()) {
+            case -1:
+                perror("Failed to fork a process");
+                exit(1);
+            case 0: // child
+                // close unnecessary file descriptor
+                close(child_to_parent[0]);
 
-            double result = calc_integral(BOUND_L + x_step * i, BOUND_L + x_step * (i+1), eps);
-            snprintf(buffer, BUFFER_SIZE, "%.15f", result);
+                double result = calc_integral(BOUND_L + x_step * i, BOUND_L + x_step * (i+1), eps);
+                snprintf(buffer, BUFFER_SIZE, "%.15f", result);
 
-            write(child_to_parent[1], buffer, BUFFER_SIZE);
-            close(child_to_parent[1]);
-            exit(0);
-        }
-        else {  //parent
-            // close unnecessary file descriptor
-            close(child_to_parent[1]);
+                write(child_to_parent[1], buffer, BUFFER_SIZE);
+                close(child_to_parent[1]);
+                exit(0);
+            default:    // parent
+                // close unnecessary file descriptor
+                close(child_to_parent[1]);
 
-            // copy file descriptor so we can use it later
-            read_file_descriptors[i] = child_to_parent[0];
+                // copy file descriptor so we can use it later
+                descriptors_to_read[i] = child_to_parent[0];
+                break;
         }
     }
 
     // parent gathers results from children and adds them up
-    for (int i = 0; i < num_of_proc; ++i) {
-        if (read(read_file_descriptors[i], buffer, BUFFER_SIZE) == -1) {
-            perror("Failed to read a pipe");
-            exit(1);
-        }
-        close(read_file_descriptors[i]);
-        integral_sum += atof(buffer);
-    }
+    read_pipes_and_sum_results(num_of_proc, descriptors_to_read);
 
     clock_gettime(CLOCK_REALTIME, &time_end);
 
-    printf("%ld\n", time_end.tv_nsec + (time_end.tv_sec - time_start.tv_sec)*1000000000 - time_start.tv_nsec);
-    //printf("%.15f\n", integral_sum);
+    printf("%ld\n", convert_to_nanoseconds(&time_start, &time_end));
 
     return 0;
 }
