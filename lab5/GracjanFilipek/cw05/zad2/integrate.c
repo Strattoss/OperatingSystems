@@ -8,7 +8,7 @@
 #define BOUND_R 1.0
 
 
-double fun_to_integr(double x) {
+double fun_to_integrate(double x) {
     return 4/(x*x + 1);
 }
 
@@ -19,13 +19,13 @@ double calc_integral(double a, double b, double eps) {
     double x = a;
 
     while (x + eps < b) {
-        sum += fun_to_integr(x + eps/2) * eps;
+        sum += fun_to_integrate(x + eps/2) * eps;
 
         x += eps;
     }
 
     // add one last rectangle (it stretches from current x to b)
-    sum += fun_to_integr((x + b) / 2) * (b - x);
+    sum += fun_to_integrate((x + b) / 2) * (b - x);
 
     return sum;
 }
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     if (argc != 1 + 2)
     {
         fprintf(stderr, "Expected exactly 2 arguments:\n"
-                        "\tprecision (length of rectangles' side\n"
+                        "\tprecision (length of rectangles' side)\n"
                         "\tnumber of child processes start\n"
                         "Got %d arguments\n",
                 argc - 1);
